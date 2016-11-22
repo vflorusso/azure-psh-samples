@@ -1,0 +1,121 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "West Europe",
+      "metadata": {
+        "description": "Location of resources"
+      }
+    },
+    "WebAppSvcPlanName": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "AppSvcPlan",
+      "metadata": {
+        "description": "Name of AppSvc Plan."
+      }
+    },
+    "WebAppSvcPlanSKU": {
+      "type": "string",
+      "allowedValues": [
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "defaultValue": "S1",
+      "metadata": {
+        "description": "App Svc Plan SKU."
+      }
+    },
+    "WebAppSvcPlanWorkerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0",
+      "metadata": {
+        "description": "Size of AppSvc Worker."
+      }
+    },
+    "WebAppName": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "Name of web site."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[parameters('WebAppSvcPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "AppSvcPlan"
+      },
+      "sku": {
+        "name": "[parameters('WebAppSvcPlanSKU')]",
+        "capacity": "[parameters('WebAppSvcPlanWorkerSize')]"
+      },
+      "properties": {
+        "name": "[parameters('WebAppSvcPlanName')]"
+      }
+    },
+    {
+      "name": "[parameters('WebAppName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', parameters('WebAppSvcPlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('WebAppSvcPlanName'))]": "Resource",
+        "displayName": "WebApp"
+      },
+      "properties": {
+        "name": "[parameters('WebAppName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', parameters('WebAppSvcPlanName'))]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "web",
+          "type": "config",
+          "dependsOn": [
+            "[concat('Microsoft.Web/sites/', parameters('WebAppName'))]"
+          ],
+          "tags": {
+            "displayName": "WebAppConfig"
+          },
+          "properties": {
+            "phpVersion": "5.6",
+            "netFrameworkVersion": "v4.6",
+            "use32BitWorkerProcess": false,
+            "webSocketsEnabled": true,
+            "alwaysOn": true,
+            "remoteDebuggingEnabled": true,
+            "remoteDebuggingVersion": "VS2015"
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "webAppOutputIPs":{
+      "value": "[split(reference(resourceId('Microsoft.Web/sites', parameters('WebAppName'))).outboundIpAddresses,',')]",
+      "type": "array"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "West Europe"
+        },
+        "WebAppSvcPlanName": {
+            "value": "vitotestapp01farm"
+        },
+        "WebAppSvcPlanSKU": {
+            "value": "S1"
+        },
+        "WebAppSvcPlanWorkerSize": {
+            "value": "1"
+        },
+        "WebAppName": {
+            "value": "vitotestapp01web"
+        }
+    }
+}

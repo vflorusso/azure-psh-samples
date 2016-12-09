@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "value1": {
+      "type": "string",
+      "defaultValue": "value1",
+      "metadata": {
+        "description": "value1"
+      }
+    },
+    "value2": {
+      "type": "string",
+      "defaultValue": "value2",
+      "metadata": {
+        "description": "value2"
+      }
+    },
+    "value3": {
+      "type": "string",
+      "defaultValue": "value3",
+      "metadata": {
+        "description": "value3"
+      }
+    }
+  },
+  "variables": {
+    "array1": [
+      "[parameters('value1')]",
+      "[parameters('value2')]",
+      "[parameters('value3')]"
+    ]
+  },
+  "resources": [],
+  "outputs": {
+      "output1":{
+          "value": "[variables('array1')]",
+          "type": "array"
+      }
+  }
+}
